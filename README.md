@@ -12,8 +12,8 @@ A lightweight keylogger for educational purposes with enhanced security and conf
 ## Installation
 1. Clone the repository:
    ```bash
-   git clone https://github.com/EForce11/Python-Keyloger.git
-   cd Python-Keyloger
+   git clone https://github.com/EForce11/Python-Keylogger.git
+   cd Python-Keylogger
    ```
 
 2. Install required dependencies:
@@ -42,7 +42,7 @@ A lightweight keylogger for educational purposes with enhanced security and conf
 
 4. Run the keylogger:
    ```bash
-   python keylogger.py
+   python keyloggerEF.py
    ```
 
 ## Warning
