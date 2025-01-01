@@ -1,34 +1,52 @@
-# Python-Keyloger
+# Python-Keylogger
 
-This Python program is a keylogger that records keyboard inputs. It periodically sends the recorded data as an email.
-
-## Description
-
-The Keylogger program allows you to monitor and record keyboard inputs on your system. It runs in the background and captures every key pressed by the user. The captured keystrokes are then stored in a log file and can be periodically sent as an email to a specified email address.
-
-This keylogger can be used for various purposes, such as monitoring computer usage, detecting unauthorized access, or even for personal use to keep track of your own keyboard activities.
-
-Please note that the use of this keylogger for any illegal or unethical activities is strictly prohibited. Always ensure that you have proper authorization and adhere to legal and ethical guidelines when using this program.
+A lightweight keylogger for educational purposes with enhanced security and configurability.
 
 ## Features
+- **Keyboard Logging**: Captures all keystrokes in the background.
+- **Encrypted Logs**: Key logs are encrypted using the Fernet encryption algorithm.
+- **Secure Email Sending**: Logs are periodically sent to your email securely over TLS.
+- **Dynamic Configuration**: Easily configure email credentials, encryption key, and sending intervals via environment variables.
+- **Cross-Platform Support**: Compatible with Windows, macOS, and Linux.
 
-- Records all keyboard inputs in the background
-- Periodically sends recorded data as an email
-- Configurable email sending interval
-- Lightweight and easy to use
+## Installation
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/EForce11/Python-Keyloger.git
+   cd Python-Keyloger
+   ```
 
-## Requirements
+2. Install required dependencies:
+   ```bash
+   pip install -r requirements.txt
+   ```
 
-- Python 3
-- The `keyboard` library
+3. Set up environment variables:
+   - `KEYLOGGER_EMAIL`: Your email address (for sending logs).
+   - `KEYLOGGER_PASSWORD`: Your email password or app-specific password.
+   - `KEYLOGGER_ENCRYPTION_KEY` (optional): A 32-byte key for Fernet encryption. If not set, a key will be generated.
 
-## Usage
+   Example on Linux/Mac:
+   ```bash
+   export KEYLOGGER_EMAIL="your-email@example.com"
+   export KEYLOGGER_PASSWORD="your-email-password"
+   export KEYLOGGER_ENCRYPTION_KEY="32-byte-random-key"
+   ```
 
-1. Modify the `LOG_FILE` variable with the desired log file name, if desired.
-2. Replace the `EMAIL_ADDRESS`, `EMAIL_PASSWORD`, and `SEND_TO_EMAIL` variables with your email account information.
-3. Optionally adjust the `EMAIL_INTERVAL` variable to set the email sending interval in seconds.
-4. Run the program using Python.
+   Example on Windows (Command Prompt):
+   ```cmd
+   set KEYLOGGER_EMAIL=your-email@example.com
+   set KEYLOGGER_PASSWORD=your-email-password
+   set KEYLOGGER_ENCRYPTION_KEY=32-byte-random-key
+   ```
+
+4. Run the keylogger:
+   ```bash
+   python keylogger.py
+   ```
+
+## Warning
+This project is for educational purposes only. Unauthorized use of this software may violate privacy laws and result in legal consequences. Always ensure you have explicit consent from the system owner before running this program.
 
 ## License
-
-This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for more information.
+This project is licensed under the MIT License. See the `LICENSE` file for details.
